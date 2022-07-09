@@ -134,9 +134,12 @@ class MarusiaRouter(APIView):
                 'end_session': True,
             }
             if bot_sum > last_sum:
-                self.response['response']['text'] += 'Вы проиграли'
+                if bot_sum > 21:
+                    self.response['response']['text'] += '\n Вы проиграли'
+                else:
+                    self.response['response']['text'] += '\n Вы выйграли'
             else:
-                self.response['response']['text'] += 'Вы выйграли'
+                self.response['response']['text'] += '\n Вы выйграли'
         else:
             self.response['response'] = {
                 'text': f'Напишите либо ещё, либо всё',
