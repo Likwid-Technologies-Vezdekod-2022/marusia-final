@@ -59,8 +59,8 @@ class MarusiaRouter(APIView):
         return randint(2, 11)
 
     def router(self, data):
-        if 'cards_sum' in self.state:
-            return self.twenty_one_in_progress(data['request']['command'], self.state['cards_sum'], self.state['cards_count'])
+        if 'user_cards_sum' in self.state:
+            return self.twenty_one_in_progress(data['request']['command'], self.state['user_cards_sum'], self.state['bot_cards_sum'])
         if 'eat_count' in self.state:
             return self.eat_in_progress(data['request']['command'], self.state['eat_count'])
         return self.game_menu(data['request']['command'])
@@ -126,8 +126,8 @@ class MarusiaRouter(APIView):
                     'text': f'Вы вытянули {self.card_decode(card)}, у вас {last_sum + card} очка(ов)',
                     'end_session': False,
                 }
-                self.response['session_state']['cards_sum'] = card + last_sum
-                self.response['session_state']['cards_count'] = bot_sum
+                self.response['session_state']['user_cards_sum'] = card + last_sum
+                self.response['session_state']['bot_cards_sum'] = bot_sum
         elif 'всё' == command.lower():
             self.response['response'] = {
                 'text': f'Вы набрали {last_sum} очков',
