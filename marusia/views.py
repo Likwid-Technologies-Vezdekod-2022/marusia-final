@@ -68,7 +68,7 @@ class MarusiaRouter(APIView):
     def game_menu(self, command: str):
         if command.lower() == 'двадцать один':
             return self.twenty_one_start()
-        if command.lower() == 'съедобное не съедобное':
+        if command.lower() == 'съедобное несъедобное':
             return self.eat_start()
         return self.get_help_response()
 
@@ -107,7 +107,7 @@ class MarusiaRouter(APIView):
 
     def get_help_response(self):
         self.response['response'] = {
-            'text': 'Команды:\n Двадцать один \n Съедобное не съедобное \n',
+            'text': 'Команды:\n Двадцать один \n Съедобное несъедобное \n',
             'end_session': True
         }
         return self.response
