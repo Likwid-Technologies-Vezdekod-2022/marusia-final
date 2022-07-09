@@ -108,7 +108,7 @@ class MarusiaRouter(APIView):
             if card + last_sum > 21:
                 if bot_sum > card + last_sum:
                     self.response['response'] = {
-                        'text': f'Вы вытянули {self.card_decode(card)}, вы набрали {last_sum + card} очков, у бота {bot_sum}, вы побелили',
+                        'text': f'Вы вытянули {self.card_decode(card)}, вы набрали {last_sum + card} очка(ов), у бота {bot_sum}, вы побелили',
                         'end_session': True,
                     }
                 else:
