@@ -62,7 +62,7 @@ class MarusiaRouter(APIView):
         if 'user_cards_sum' in self.state:
             return self.twenty_one_in_progress(data['request']['command'], self.state['user_cards_sum'], self.state['bot_cards_sum'])
         if 'eat_count' in self.state:
-            return self.eat_in_progress(data['request']['command'], self.state['eat_count'])
+            return self.eat_in_progress(data['request']['command'], self.state['food'], self.state['eat_count'])
         return self.game_menu(data['request']['command'])
 
     def game_menu(self, command: str):
@@ -73,16 +73,37 @@ class MarusiaRouter(APIView):
         return self.get_help_response()
 
     def eat_start(self):
+        food = choice(self.eatable) if randint(0, 1) else choice(self.uneatable)
         self.response['response'] = {
-            'text': f'Вы зашли в игру съедобное/не съедобное',
+            'text': f'Вы зашли в игру съедобное/не съедобное\n{food} - съедобное?',
             'end_session': False,
         }
         self.response['session_state']['eat_count'] = 0
-        self.response['session_state']['food'] = choice(self.eatable) if randint(0, 1) else choice(self.uneatable)
+        self.response['session_state']['food'] = food
         return self.response
 
-    def eat_in_progress(self, command, last_count):
-        pass
+    def eat_in_progress(self, command, last_food, last_count):
+        if command.lower() == 'выход':
+            self.response['response'] = {
+                'text': f'Выходим...',
+                'end_session': True,
+            }
+            return self.response
+        food = choice(self.eatable) if randint(0, 1) else choice(self.uneatable)
+        if not ((last_food in self.eatable) ^ (command.lower() == "съедобное")):
+            self.response['response'] = {
+                'text': f'Правельно\n{food} - съедобное?',
+                'end_session': False,
+            }
+            self.response['session_state']['eat_count'] = last_count + 1
+        else:
+            self.response['response'] = {
+                'text': f'Не правельно\n{food} - съедобное?',
+                'end_session': False,
+            }
+            self.response['session_state']['eat_count'] = 0
+        self.response['session_state']['food'] = food
+        return self.response
 
     def get_help_response(self):
         self.response['response'] = {
