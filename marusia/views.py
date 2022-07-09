@@ -90,15 +90,16 @@ class MarusiaRouter(APIView):
             }
             return self.response
         food = choice(self.eatable) if randint(0, 1) else choice(self.uneatable)
-        if not ((last_food in self.eatable) ^ (command.lower() == "съедобное")):
+        if not ((last_food in self.eatable) ^ (command.lower() == "съедобное")) and command.lower() in ['съедобное',
+                                                                                                        'не съедобное']:
             self.response['response'] = {
-                'text': f'Правельно\n{food} - съедобное?',
+                'text': f'Правильно\n{food} - съедобное?',
                 'end_session': False,
             }
             self.response['session_state']['eat_count'] = last_count + 1
         else:
             self.response['response'] = {
-                'text': f'Не правельно\n{food} - съедобное?',
+                'text': f'Не Правильно\n{food} - съедобное?',
                 'end_session': False,
             }
             self.response['session_state']['eat_count'] = 0
