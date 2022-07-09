@@ -1,3 +1,5 @@
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from random import randint
 
@@ -18,7 +20,7 @@ class MarusiaRouter(APIView):
             'session': data['session'],
             'session_state': {}
         }
-        return self.router(data)
+        return Response(self.router(data), status.HTTP_200_OK)
 
     def get_random_card(self):
         return randint(2, 11)
