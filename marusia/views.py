@@ -5,6 +5,19 @@ from random import randint
 
 
 class MarusiaRouter(APIView):
+    card_map = {
+        2: 'Валет',
+        3: "Дама",
+        4: "Король",
+        5: "5",
+        6: "6",
+        7: "7",
+        8: "8",
+        9: "9",
+        10: "10",
+        11: "Туз"
+    }
+
     def post(self, request):
         data = request.data
         self.state = data['state']['session']
@@ -22,7 +35,11 @@ class MarusiaRouter(APIView):
         }
         return Response(self.router(data), status.HTTP_200_OK)
 
-    def get_random_card(self):
+    def card_decode(self, card):
+        return self.card_map[card]
+
+    @staticmethod
+    def get_random_card():
         return randint(2, 11)
 
     def router(self, data):
@@ -37,13 +54,25 @@ class MarusiaRouter(APIView):
     def twenty_one_start(self):
         cards = [self.get_random_card() for i in range(2)]
         self.response['response'] = {
-            'text': f'Вы вытянули 2 карты {cards[0]} и {cards[1]}',
+            'text': f'Вы вытянули 2 карты {self.card_decode(cards[0])} и {self.card_decode(cards[1])}',
             'end_session': False,
         }
         self.response['session_state']['cards_sum'] = sum(cards)
-        self.response['session_state']['cards_count'] = "2"
+        self.response['session_state']['cards_count'] = 2
         return self.response
 
     def twenty_one_in_progress(self, command):
         if command.lower() == 'ещё':
-            new_card = self.get_random_card()
+            card = self.get_random_card()
+            self.response['response'] = {
+                'text': f'Вы вытянули 2 карты {self.card_decode(card)} и {self.card_decode(card)}',
+                'end_session': False,
+            }
+            self.response['session_state']['cards_sum'] += card
+            self.response['session_state']['cards_count'] += 1
+        else:
+            self.response['response'] = {
+                'text': f'Вы набрали {self.response["session_state"]["cards_sum"]}',
+                'end_session': False,
+            }
+        return self.response
