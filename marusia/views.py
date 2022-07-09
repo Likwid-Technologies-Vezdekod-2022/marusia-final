@@ -83,7 +83,7 @@ class MarusiaRouter(APIView):
         return self.response
 
     def eat_in_progress(self, command, last_food, last_count):
-        if command.lower() == 'выход':
+        if command.lower() == 'let me be':
             self.response['response'] = {
                 'text': f'Выходим...',
                 'end_session': True,
