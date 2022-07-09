@@ -44,7 +44,7 @@ class MarusiaRouter(APIView):
 
     def router(self, data):
         if 'cards_sum' in self.state:
-            return
+            return self.twenty_one_in_progress(data['request']['command'], self.state['cards_sum'], self.state['cards_count'])
         return self.game_menu(data['request']['command'])
 
     def game_menu(self, command: str):
