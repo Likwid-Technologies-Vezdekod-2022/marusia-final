@@ -43,8 +43,8 @@ class MarusiaRouter(APIView):
         return randint(2, 11)
 
     def router(self, data):
-        if 'prev_question' in self.state:
-            pass
+        if 'cards_sum' in self.state:
+            return
         return self.game_menu(data['request']['command'])
 
     def game_menu(self, command: str):
@@ -59,20 +59,34 @@ class MarusiaRouter(APIView):
         }
         self.response['session_state']['cards_sum'] = sum(cards)
         self.response['session_state']['cards_count'] = 2
+        if sum(cards) == '21':
+            self.response['response']['text'] = 'Вы выйграли у вас туз и 10'
+            self.response['response']['end_session'] = True
         return self.response
 
-    def twenty_one_in_progress(self, command):
+    def twenty_one_in_progress(self, command, last_sum, last_count):
         if command.lower() == 'ещё':
             card = self.get_random_card()
-            self.response['response'] = {
-                'text': f'Вы вытянули 2 карты {self.card_decode(card)} и {self.card_decode(card)}',
-                'end_session': False,
-            }
-            self.response['session_state']['cards_sum'] += card
-            self.response['session_state']['cards_count'] += 1
+            if card + last_sum > 21:
+                self.response['response'] = {
+                    'text': f'Вы вытянули {self.card_decode(card)}, вы проиграли',
+                    'end_session': True,
+                }
+            elif card + last_sum == 21:
+                self.response['response'] = {
+                    'text': f'Вы набрали 21 очко, вы победили, урааа',
+                    'end_session': True
+                }
+            else:
+                self.response['response'] = {
+                    'text': f'Вы вытянули {self.card_decode(card)}, у вас {last_sum + card} очка(ов)',
+                    'end_session': False,
+                }
+                self.response['session_state']['cards_sum'] = card + last_sum
+                self.response['session_state']['cards_count'] = 1 + last_count
         else:
             self.response['response'] = {
-                'text': f'Вы набрали {self.response["session_state"]["cards_sum"]}',
-                'end_session': False,
+                'text': f'Вы набрали {last_sum} очков',
+                'end_session': True,
             }
         return self.response
